@@ -148,6 +148,54 @@ class Hue
         $this->pest->put('/groups/' . $room_id . '/action', json_encode($data));
     }
 
+    /**
+     * Gets a list of all configured scenes
+     *
+     * @return Scene[] A list of scenes
+     *
+     */
+    public function scenes() : array
+    {
+        $response = json_decode($this->pest()->get('scenes'));
+        $scenes = [];
+        foreach($response as $id => $spec)
+        {
+            $scenes[] = Scene::createFromJson($id, $spec);
+        }
+
+        return $scenes;
+    }
+
+    public function scene(string $id) : array
+    {
+        $raw = json_decode($this->pest()->get('scene/' . $id));
+
+        return $raw;
+    }
+
+    public function saveScene(string $name, array $lights)
+    {
+        $data = [
+            'name' => $name,
+            'recycle' => false,
+            'lights' => $lights,
+            //'type' => Scene::TYPE_LIGHTS,
+        ];
+
+        $raw = $this->pest()->post('scenes', json_encode($data));
+
+        print_r(json_decode($raw));
+    }
+
+    public function recallScene(string $id)
+    {
+        $data = [
+            'scene' => $id,
+        ];
+
+        $response = $this->pest()->put('groups/0/action', json_encode($data));
+    }
+
     // Gin up a random color
     public function randomColor()
     {
