@@ -100,6 +100,53 @@ class Hue
         return $result;
     }
 
+    /**
+     *
+     * @return array A list of groups
+     *
+     */
+    public function groups() : array
+    {
+        $response = json_decode($this->pest()->get('groups'));
+        $groups = [];
+        foreach($response as $id => $spec)
+        {
+            $groups[] = Group::createFromJson($id, $spec);
+        }
+
+        return $groups;
+    }
+
+    public function rooms() : array
+    {
+        $groups = $this->groups();
+        $rooms = [];
+        foreach($groups as $group)
+        {
+            if($group->getType() === Group::TYPE_ROOM)
+            {
+                $rooms[] = $group;
+            }
+        }
+
+        return $rooms;
+    }
+
+    public function switchRoomOn($room_id)
+    {
+        $data = [
+            'on' => true,
+        ];
+        $this->pest->put('/groups/' . $room_id . '/action', json_encode($data));
+    }
+
+    public function switchRoomOff($room_id)
+    {
+        $data = [
+            'on' => false,
+        ];
+        $this->pest->put('/groups/' . $room_id . '/action', json_encode($data));
+    }
 
     // Gin up a random color
     public function randomColor()
