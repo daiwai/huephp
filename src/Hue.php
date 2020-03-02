@@ -92,6 +92,11 @@ class Hue
     }
 
 
+    public function config()
+    {
+        return json_decode($this->pest()->get('config'));
+    }
+
     // Gets an array of currently configured schedules
     public function schedules()
     {
